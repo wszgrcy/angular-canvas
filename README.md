@@ -1,11 +1,19 @@
 # AngularCanvas
 
 这个项目是以`zrender`为引擎,替换默认 dom
+# 目前已经实现的
+- 添加元素,删除元素,插入元素
+> 虽然只是div text.....
+- style 中width height background
+> 不一定符合css规范
+- click事件
+> 没有搞捕获冒泡
+- 插值表达式
+>插入的text与后面的容器中的属于两个实例,没搞匿名盒子判断之类的.....
 
 # 使用
 
 - 目前无法正式使用,仅处于 demo 阶段
-
 # todo
 
 - `ZrenderElement`的刷新机制,目前是每更新一次重排一次,实际上可以考虑局部重排或者判断是否需要重排
