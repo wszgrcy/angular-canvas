@@ -1,4 +1,4 @@
-import { Renderer2 } from '@angular/core';
+import { Renderer2, RendererStyleFlags2 } from '@angular/core';
 import { CanvasZrenderService } from './canvas-zrender';
 import { ZrenderElement } from './element/element';
 import { isText } from './element/is';
@@ -7,82 +7,124 @@ export class CanvasRenderer implements Renderer2 {
   data: { [key: string]: any } = Object.create(null);
   destroy() {}
   createElement(name: string, namespace?: string | null) {
-    console.log('创建元素?', name, namespace);
+    console.warn('[✓]创建元素?', name, namespace);
     return this.canvasZrender.create(name);
   }
   createComment(value: string) {
-    console.log('创建评论?');
+    console.warn('[✓]创建评论?');
     return this.canvasZrender.create('comment', value);
   }
   createText(value: string) {
-    console.log('创建文本?', value);
+    console.warn('[✓]创建文本?', value);
     return this.canvasZrender.create('text', value);
   }
-  destroyNode() {
-    console.log('删除节点?');
+  /** todo 目前不需要实现 */
+  destroyNode(a) {
+    // console.warn('[×]删除节点?',a);
   }
   appendChild(parent: ZrenderElement, newChild: ZrenderElement) {
-    console.log('添加子节点', parent, newChild);
-    newChild.parent = parent;
-    parent.children.push(newChild);
-    newChild.update();
-    this.canvasZrender.add(newChild.instance);
+    console.warn('[✓]添加子节点', parent, newChild);
+
+    parent.appendChild(newChild);
+    this.canvasZrender.selectRootElement().reFlow();
   }
-  insertBefore(parent: any, newChild: any, refChild: any, isMove?: boolean) {
-    console.log('插入到前面?', parent, newChild, refChild, isMove);
+  insertBefore(
+    parent: ZrenderElement,
+    newChild: ZrenderElement,
+    refChild: ZrenderElement,
+    isMove?: boolean
+  ) {
+    console.warn('[✓]插入到前面?', parent, newChild, refChild, isMove);
+    parent.insertBefore(newChild, refChild, isMove);
+    this.canvasZrender.selectRootElement().reFlow();
   }
-  removeChild() {
-    console.log('移除子节点?');
+  removeChild(
+    parent: ZrenderElement,
+    oldChild: ZrenderElement,
+    isHostElement?: boolean
+  ) {
+    console.warn('[✓]移除子节点?', parent, oldChild, isHostElement);
+    parent.removeChild(oldChild, isHostElement);
+    this.canvasZrender.selectRootElement().reFlow();
   }
   selectRootElement(selectorOrNode: string | any, preserveContent?: boolean) {
-    if (this.canvasZrender.instance) {
-      return this.canvasZrender.instance;
-    }
+    console.warn('[✓]选择子元素');
     let el = document.querySelector(selectorOrNode);
     this.canvasZrender.init(el);
-    let root = this.canvasZrender.create('div');
-    return root;
+    let zrenderElement = this.canvasZrender.selectRootElement();
+    this.canvasZrender.add(zrenderElement);
+    return zrenderElement;
   }
   parentNode(node: ZrenderElement) {
-    console.log('父级?', node);
+    console.warn('[✓]父级?', node);
     return node.parent;
   }
   nextSibling() {
-    console.log('下一个?');
+    console.warn('[×]下一个?');
   }
+  /**
+   * todo 仅实现样式 display部分,background部分,width部分,height部分 部分
+   */
   setAttribute(
-    el: any,
+    el: ZrenderElement,
     name: string,
     value: string,
     namespace?: string | null
   ) {
-    console.log('设置属性', el, name, value, namespace);
+    console.warn(
+      '[×]设置属性',
+      el,
+      '名字',
+      name,
+      '值',
+      value,
+      '空间',
+      namespace
+    );
+    el.setStyle(name, value, namespace);
+    this.canvasZrender.selectRootElement().reFlow();
+
   }
   removeAttribute() {
-    console.log('删除属性');
+    console.warn('[×]删除属性');
   }
   addClass() {
-    console.log('添加类');
+    console.warn('[×]添加类');
   }
   removeClass() {
-    console.log('移除类');
+    console.warn('[×]移除类');
   }
-  setStyle() {
-    console.log('设置样式');
+  setStyle(el: ZrenderElement, style: string, value: any, flags?: RendererStyleFlags2) {
+    console.warn('[×]设置样式',el,style,value,flags);
+    el.style={...el.style,[style]:value}
+    this.canvasZrender.selectRootElement().reFlow();
   }
   removeStyle() {
-    console.log('移除样式');
+    console.warn('[×]移除样式');
   }
   setProperty() {
-    console.log('设置属性');
+    console.warn('[×]设置属性');
   }
   setValue(node: ZrenderElement, value: string) {
-    console.log('设置值', node, value);
+    console.warn('设置值', node, value);
     if (isText(node.instance)) {
-      node.instance.attr('style', { text: value });
+      node.instance.attr('style', { text: value.trim() });
     }
   }
-  listen() {
+  listen(
+    target: ZrenderElement,
+    eventName: string,
+    callback: (event: any) => boolean | void
+  ) {
+    console.warn('[×]监听?', target, eventName, callback);
+    if (eventName === 'click') {
+      target.contaienr.on('click', (e) => {
+        callback(e);
+      });
+      return () => {
+        target.contaienr.off('click');
+      };
+    }
     return () => {};
   }
 }

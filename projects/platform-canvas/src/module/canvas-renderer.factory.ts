@@ -13,7 +13,7 @@ export class CanvasRendererFactory implements RendererFactory2 {
   private rendererByCompId = new Map<string, Renderer2>();
   private defaultRenderer!: Renderer2;
 
-  constructor(private canvasZrender:CanvasZrenderService) {
+  constructor(private canvasZrender: CanvasZrenderService) {
     this.defaultRenderer = new CanvasRenderer(canvasZrender);
   }
 
